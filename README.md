@@ -1,4 +1,4 @@
-# Online Little Lemon Restaurant Project README
+# Online Little Lemon Restaurant
 
 ## Project Overview
 This Django-based web application, "Little Lemon," serves as an online restaurant platform. Users can access the menu, make reservations, and discover more about the restaurant.
