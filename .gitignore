@@ -1,0 +1,38 @@
+# Python Files
+*.py[cod]
+__pycache__/
+*.pyo
+
+# Django Files
+*.sqlite3
+db.sqlite3
+*.pot
+*.po
+*.mo
+*.manifest
+
+# Development Environment
+.DS_Store
+.env
+.venv/
+.idea/
+*.swp
+*.swo
+*.swn
+*.bak
+*.orig
+
+# OS generated files
+ehthumbs.db
+Thumbs.db
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite
+
+# Cache
+.cache
+*.egg-info/
+dist/
+build/
