@@ -36,3 +36,6 @@ Thumbs.db
 *.egg-info/
 dist/
 build/
+
+#Custom
+guidline_to_follow.md
