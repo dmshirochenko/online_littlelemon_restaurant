@@ -14,6 +14,7 @@ class MenuItem(models.Model):
     title = models.CharField(max_length=255, db_index=True)
     price = models.DecimalField(max_digits=6, decimal_places=2, db_index=True)
     featured = models.BooleanField(db_index=True)
+    is_item_of_the_day = models.BooleanField(default=False, db_index=True)  # New field
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
 
     def __str__(self):
@@ -36,16 +37,17 @@ class Cart(models.Model):
 
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    delivery_crew = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        related_name="delivery_crew",
-        null=True,
-        limit_choices_to={"groups__name": "Delivery crew"},
-    )
-    status = models.BooleanField(db_index=True, default=0)
+    status = models.BooleanField(db_index=True, default=False)
     total = models.DecimalField(max_digits=6, decimal_places=2)
     date = models.DateField(db_index=True)
+    assigned_to = models.ForeignKey(  # New field
+        User,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="assigned_orders",
+        limit_choices_to={"groups__name": "Delivery_Crew"},
+    )
 
     def __str__(self):
         return str(self.id)
