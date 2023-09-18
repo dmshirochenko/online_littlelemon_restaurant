@@ -32,7 +32,7 @@ class Cart(models.Model):
         unique_together = ("menuitem", "user")
 
     def __str__(self):
-        return self.user
+        return str(self.user)
 
 
 class Order(models.Model):
