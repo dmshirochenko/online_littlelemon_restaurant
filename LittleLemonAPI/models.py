@@ -48,6 +48,7 @@ class Order(models.Model):
         related_name="assigned_orders",
         limit_choices_to={"groups__name": "Delivery_Crew"},
     )
+    is_delivered = models.BooleanField(db_index=True, default=False)  # New field
 
     def __str__(self):
         return str(self.id)
