@@ -5,7 +5,7 @@ from rest_framework import status
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 
-from .permissions import IsManager
+from .permissions import IsManager, IsDeliveryCrew
 from .models import MenuItem, Category, Order
 from .serializers import MenuItemSerializer, CategorySerializer, UserSerializer, OrderSerializer
 
@@ -111,3 +111,29 @@ class AssignOrderToDeliveryCrewView(generics.UpdateAPIView):
         return Response(
             {"message": f"Order {order.id} assigned to Delivery Crew member {user.username}"}, status=status.HTTP_200_OK
         )
+
+
+class OrdersAssignedToDeliveryCrewView(generics.ListAPIView):
+    permission_classes = [IsDeliveryCrew]
+    serializer_class = OrderSerializer
+
+    def get_queryset(self):
+        return Order.objects.filter(assigned_to=self.request.user)
+
+
+class MarkOrderDeliveredView(generics.UpdateAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    permission_classes = [IsDeliveryCrew]
+
+    def update(self, request, *args, **kwargs):
+        order = self.get_object()
+
+        if order.assigned_to == request.user:
+            order.is_delivered = True
+            order.save()
+            return Response({"message": "Order marked as delivered"}, status=status.HTTP_200_OK)
+        else:
+            return Response(
+                {"error": "You are not authorized to mark this order as delivered"}, status=status.HTTP_403_FORBIDDEN
+            )
