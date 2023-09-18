@@ -7,7 +7,14 @@ from django.shortcuts import get_object_or_404
 
 from .permissions import IsManager, IsDeliveryCrew, IsCustomer
 from .models import MenuItem, Category, Order, OrderItem, Cart
-from .serializers import MenuItemSerializer, CategorySerializer, UserSerializer, OrderSerializer, CartSerializer, OrderItemSerializer
+from .serializers import (
+    MenuItemSerializer,
+    CategorySerializer,
+    UserSerializer,
+    OrderSerializer,
+    CartSerializer,
+    OrderItemSerializer,
+)
 
 
 class CategoriesView(generics.ListCreateAPIView):
@@ -148,20 +155,21 @@ class CartOperationsView(generics.ListCreateAPIView):
         return Cart.objects.filter(user=self.request.user)
 
     def post(self, request, *args, **kwargs):
-        menu_item_id = request.data.get('menuitem')
+        menu_item_id = request.data.get("menuitem")
         menu_item = get_object_or_404(MenuItem, id=menu_item_id)
         data = {
-            'user': request.user.id,
-            'menuitem': menu_item.id,
-            'quantity': request.data.get('quantity'),
-            'unit_price': menu_item.price,
-            'price': menu_item.price * int(request.data.get('quantity'))
+            "user": request.user.id,
+            "menuitem": menu_item.id,
+            "quantity": request.data.get("quantity"),
+            "unit_price": menu_item.price,
+            "price": menu_item.price * int(request.data.get("quantity")),
         }
         serializer = self.serializer_class(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 # Feature 20 & 21: Order Operations
 class OrderOperationsView(generics.ListCreateAPIView):
@@ -174,16 +182,16 @@ class OrderOperationsView(generics.ListCreateAPIView):
     def post(self, request, *args, **kwargs):
         cart_items = Cart.objects.filter(user=request.user)
         if not cart_items.exists():
-            return Response({'error': 'Cart is empty'}, status=status.HTTP_400_BAD_REQUEST)
-        
+            return Response({"error": "Cart is empty"}, status=status.HTTP_400_BAD_REQUEST)
+
         total_price = sum([item.price for item in cart_items])
         order_data = {
-            'user': request.user.id,
-            'status': False,
-            'total': total_price,
-            'date': request.data.get('date', None)
+            "user": request.user.id,
+            "status": False,
+            "total": total_price,
+            "date": request.data.get("date", None),
         }
-        
+
         order_serializer = OrderSerializer(data=order_data)
         if order_serializer.is_valid():
             order = order_serializer.save()
@@ -191,11 +199,7 @@ class OrderOperationsView(generics.ListCreateAPIView):
             # Convert cart items to order items
             order_items = []
             for cart_item in cart_items:
-                order_items.append(OrderItem(
-                    order=order,
-                    menuitem=cart_item.menuitem,
-                    quantity=cart_item.quantity
-                ))
+                order_items.append(OrderItem(order=order, menuitem=cart_item.menuitem, quantity=cart_item.quantity))
 
             OrderItem.objects.bulk_create(order_items)
 
@@ -203,11 +207,12 @@ class OrderOperationsView(generics.ListCreateAPIView):
             cart_items.delete()
 
             return Response(order_serializer.data, status=status.HTTP_201_CREATED)
-        
+
         return Response(order_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class SingleOrderView(generics.RetrieveAPIView):
     serializer_class = OrderSerializer
 
     def get_queryset(self):
-        return Order.objects.filter(user=self.request.user, id=self.kwargs['pk'])
+        return Order.objects.filter(user=self.request.user, id=self.kwargs["pk"])
