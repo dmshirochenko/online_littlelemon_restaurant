@@ -1,9 +1,7 @@
-from django.urls import path, include
+from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("auth/", include("djoser.urls")),
-    path("auth/", include("djoser.urls.authtoken")),
     path("menu-items", views.MenuItemListView.as_view()),
     path("categories", views.CategoriesView.as_view()),
     path("menu-items/<int:pk>", views.MenuItemDetailView.as_view()),
