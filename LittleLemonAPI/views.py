@@ -9,12 +9,11 @@ from rest_framework import viewsets
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 
-from .permissions import IsManager, IsDeliveryCrew, IsCustomer
+from .permissions import IsManager, IsDeliveryCrew
 from .models import MenuItem, Category, Order, OrderItem, Cart
 from .serializers import (
     MenuItemSerializer,
     CategorySerializer,
-    UserSerializer,
     UserSerilializer,
     OrderSerializer,
     CartSerializer,
@@ -95,14 +94,6 @@ class AssignOrderToDeliveryCrewView(generics.UpdateAPIView):
         )
 
 
-class OrdersAssignedToDeliveryCrewView(generics.ListAPIView):
-    permission_classes = [IsDeliveryCrew]
-    serializer_class = OrderSerializer
-
-    def get_queryset(self):
-        return Order.objects.filter(assigned_to=self.request.user)
-
-
 class MarkOrderDeliveredView(generics.UpdateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
@@ -121,10 +112,9 @@ class MarkOrderDeliveredView(generics.UpdateAPIView):
             )
 
 
-# Feature 18 & 19: Cart Operations
 class CartOperationsView(generics.ListCreateAPIView):
     serializer_class = CartSerializer
-    permission_classes = [IsCustomer]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Cart.objects.filter(user=self.request.user)
@@ -145,14 +135,25 @@ class CartOperationsView(generics.ListCreateAPIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request, *args, **kwargs):
+        Cart.objects.all().filter(user=self.request.user).delete()
+        return Response("ok")
 
-# Feature 20 & 21: Order Operations
+
 class OrderOperationsView(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = OrderSerializer
-    permission_classes = [IsCustomer]
+    pagination_class = None
 
     def get_queryset(self):
-        return Order.objects.filter(user=self.request.user)
+        if self.request.user.is_superuser:
+            return Order.objects.all()
+        elif self.request.user.groups.count() == 0:  # normal customer - no group
+            return Order.objects.all().filter(user=self.request.user)
+        elif self.request.user.groups.filter(name="Delivery_Crew").exists():  # delivery crew
+            return Order.objects.all().filter(delivery_crew=self.request.user)  # only show oreders assigned to him
+        else:  # delivery crew or manager
+            return Order.objects.all()
 
     def post(self, request, *args, **kwargs):
         cart_items = Cart.objects.filter(user=request.user)
@@ -188,6 +189,7 @@ class OrderOperationsView(generics.ListCreateAPIView):
 
 class SingleOrderView(generics.RetrieveAPIView):
     serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user, id=self.kwargs["pk"])
