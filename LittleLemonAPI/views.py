@@ -1,8 +1,11 @@
 from rest_framework import generics
 from rest_framework import permissions
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import viewsets
+
+
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 
@@ -12,6 +15,7 @@ from .serializers import (
     MenuItemSerializer,
     CategorySerializer,
     UserSerializer,
+    UserSerilializer,
     OrderSerializer,
     CartSerializer,
     OrderItemSerializer,
@@ -24,7 +28,7 @@ class CategoriesView(generics.ListCreateAPIView):
 
     def get_permissions(self):
         permission_classes = []
-        if self.request.method != 'GET':
+        if self.request.method != "GET":
             permission_classes = [IsAuthenticated]
 
         return [permission() for permission in permission_classes]
@@ -39,7 +43,7 @@ class MenuItemListView(generics.ListCreateAPIView):
 
     def get_permissions(self):
         permission_classes = []
-        if self.request.method != 'GET':
+        if self.request.method != "GET":
             permission_classes = [IsAuthenticated]
 
         return [permission() for permission in permission_classes]
@@ -51,48 +55,10 @@ class MenuItemDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_permissions(self):
         permission_classes = []
-        if self.request.method != 'GET':
+        if self.request.method != "GET":
             permission_classes = [IsAuthenticated]
 
         return [permission() for permission in permission_classes]
-
-
-class ManagersListView(generics.ListAPIView):
-    permission_classes = [permissions.IsAdminUser]
-    serializer_class = UserSerializer
-
-    def get_queryset(self):
-        managers_group = Group.objects.get(name="Managers")
-        return User.objects.filter(groups=managers_group)
-
-
-class ManagersRemoveView(generics.DestroyAPIView):
-    permission_classes = [permissions.IsAdminUser]
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-    def perform_destroy(self, instance):
-        managers_group = Group.objects.get(name="Managers")
-        instance.groups.remove(managers_group)
-
-
-class DeliveryCrewListView(generics.ListAPIView):
-    permission_classes = [permissions.IsAdminUser]
-    serializer_class = UserSerializer
-
-    def get_queryset(self):
-        delivery_group = Group.objects.get(name="Delivery_Crew")
-        return User.objects.filter(groups=delivery_group)
-
-
-class DeliveryCrewRemoveView(generics.DestroyAPIView):
-    permission_classes = [permissions.IsAdminUser]
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-    def perform_destroy(self, instance):
-        delivery_group = Group.objects.get(name="Delivery_Crew")
-        instance.groups.remove(delivery_group)
 
 
 class UpdateItemOfTheDayView(generics.UpdateAPIView):
@@ -105,19 +71,6 @@ class UpdateItemOfTheDayView(generics.UpdateAPIView):
         instance.is_item_of_the_day = True
         instance.save()
         return Response({"message": "Item of the day updated"}, status=status.HTTP_200_OK)
-
-
-class AssignUserToDeliveryCrewView(generics.UpdateAPIView):
-    permission_classes = [IsManager]
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-    def update(self, request, *args, **kwargs):
-        user = self.get_object()
-        delivery_group = Group.objects.get(name="Delivery Crew")
-        user.groups.add(delivery_group)
-        user.save()
-        return Response({"message": "User assigned to Delivery Crew"}, status=status.HTTP_200_OK)
 
 
 class AssignOrderToDeliveryCrewView(generics.UpdateAPIView):
@@ -238,3 +191,54 @@ class SingleOrderView(generics.RetrieveAPIView):
 
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user, id=self.kwargs["pk"])
+
+
+class GroupViewSet(viewsets.ViewSet):
+    permission_classes = [IsAdminUser]
+
+    def list(self, request):
+        users = User.objects.all().filter(groups__name="Managers")
+        items = UserSerilializer(users, many=True)
+        return Response(items.data)
+
+    def create(self, request):
+        user = get_object_or_404(User, username=request.data["username"])
+        managers = Group.objects.get(name="Managers")
+        managers.user_set.add(user)
+        return Response({"message": "user added to the manager group"}, 200)
+
+    def destroy(self, request):
+        user = get_object_or_404(User, username=request.data["username"])
+        managers = Group.objects.get(name="Managers")
+        managers.user_set.remove(user)
+        return Response({"message": "user removed from the manager group"}, 200)
+
+
+class DeliveryCrewViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request):
+        users = User.objects.all().filter(groups__name="Delivery_Crew")
+        items = UserSerilializer(users, many=True)
+        return Response(items.data)
+
+    def create(self, request):
+        # only for super admin and managers
+        if self.request.user.is_superuser is False:
+            if self.request.user.groups.filter(name="Managers").exists() is False:
+                return Response({"message": "forbidden"}, status.HTTP_403_FORBIDDEN)
+
+        user = get_object_or_404(User, username=request.data["username"])
+        dc = Group.objects.get(name="Delivery_Crew")
+        dc.user_set.add(user)
+        return Response({"message": "user added to the delivery crew group"}, 200)
+
+    def destroy(self, request):
+        # only for super admin and managers
+        if self.request.user.is_superuser is False:
+            if self.request.user.groups.filter(name="Managers").exists() is False:
+                return Response({"message": "forbidden"}, status.HTTP_403_FORBIDDEN)
+        user = get_object_or_404(User, username=request.data["username"])
+        dc = Group.objects.get(name="Delivery_Crew")
+        dc.user_set.remove(user)
+        return Response({"message": "user removed from the delivery crew group"}, 200)
