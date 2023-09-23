@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("LittleLemonAPI", "0004_remove_order_delivery_crew"),
     ]
