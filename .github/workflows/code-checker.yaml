@@ -36,5 +36,12 @@ jobs:
         pipenv install
     - name: Run Migrations
       run: pipenv run python manage.py migrate
+    - name: Inject secrets into environment
+      env:
+        TEST_SUPERUSER_NAME: ${{ secrets.TEST_SUPERUSER_NAME }}
+        TEST_SUPERUSER_PASSWORD: ${{ secrets.TEST_SUPERUSER_PASSWORD }}
+      run: |
+        echo "TEST_SUPERUSER_NAME=${TEST_SUPERUSER_NAME}" >> $GITHUB_ENV
+        echo "TEST_SUPERUSER_PASSWORD=${TEST_SUPERUSER_PASSWORD}" >> $GITHUB_ENV
     - name: Run Tests
       run: pipenv run python manage.py test
