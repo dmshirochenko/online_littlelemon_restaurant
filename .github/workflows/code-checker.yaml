@@ -1,19 +1,40 @@
-name: Linter Check on Push
+name: Lint and Test on Push
+
 on: [push]
+
 jobs:
   linter:
     name: Linter
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Install Python
+    - name: Install Python 3.11
       uses: actions/setup-python@v2
       with:
-        python-version: 3.9.x
+        python-version: '3.11'
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8==3.9.0
+        pip install pipenv
+        pipenv install --dev
     - name: Run Flake8
-      run: flake8 .
+      run: pipenv run flake8 .
 
+  test:
+    name: Django Test and Migrate
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install Python 3.11
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.11'
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pipenv
+        pipenv install
+    - name: Run Migrations
+      run: pipenv run python manage.py migrate
+    - name: Run Tests
+      run: pipenv run python manage.py test
