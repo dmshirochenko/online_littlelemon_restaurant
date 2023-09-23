@@ -51,7 +51,9 @@ class GroupViewSetTest(APITestCase):
     def setUp(self):
         self.client = APIClient()
         self.admin_user = User.objects.create_superuser(
-            username=os.environ.get("TEST_USERNAME"), email="", password=os.environ.get("TEST_SUPERUSER_PASSWORD")
+            username=os.environ.get("TEST_USERNAME", "admin"),
+            email="",
+            password=os.environ.get("TEST_SUPERUSER_PASSWORD", "admin"),
         )
         self.client.force_authenticate(user=self.admin_user)
 
