@@ -227,7 +227,7 @@ class DeliveryCrewViewSet(viewsets.ViewSet):
     def create(self, request):
         # only for super admin and managers
         if self.request.user.is_superuser is False:
-            if self.request.user.groups.filter(name="Managers").exists() is False:
+            if not self.request.user.groups.filter(name="Managers").exists():
                 return Response({"message": "forbidden"}, status.HTTP_403_FORBIDDEN)
 
         user = get_object_or_404(User, username=request.data["username"])
@@ -238,7 +238,7 @@ class DeliveryCrewViewSet(viewsets.ViewSet):
     def destroy(self, request):
         # only for super admin and managers
         if self.request.user.is_superuser is False:
-            if self.request.user.groups.filter(name="Managers").exists() is False:
+            if not self.request.user.groups.filter(name="Managers").exists():
                 return Response({"message": "forbidden"}, status.HTTP_403_FORBIDDEN)
         user = get_object_or_404(User, username=request.data["username"])
         dc = Group.objects.get(name="Delivery_Crew")
