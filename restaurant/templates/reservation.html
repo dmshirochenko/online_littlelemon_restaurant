@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section>
+  <article>
+    <h1>All reservations</h1>
+    <input type="hidden" id="bookingUrl" value="{% url 'bookings' %}">
+    <div class="row">
+      <div class="column" id="formColumn">
+        <div class="form-control">
+          <input type="date" id="datePicker">
+          <button id="fetchButton">Fetch Bookings</button>
+        </div>
+        <div id="loader">Loading...</div>
+        <div id="jsonOutput"></div>
+      </div>
+      <div class="column">
+        <div class="videowrap">
+          <!-- Your iframe code -->
+        </div>
+      </div>
+    </div>
+  </article>
+</section>
+
+<link rel="stylesheet" type="text/css" href="{% static 'css/reservation.css' %}">
+<script src="{% static 'js/reservation.js' %}"></script>
+{% endblock %}

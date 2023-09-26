@@ -1,4 +1,5 @@
 from django.contrib import admin
-from .models import Menu  # Assuming Menu is in the same package
+from .models import Menu, Booking
 
 admin.site.register(Menu)
+admin.site.register(Booking)

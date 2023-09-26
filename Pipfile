@@ -9,6 +9,7 @@ djangorestframework = "*"
 django-filter = "*"
 djoser = "*"
 python-dotenv = "*"
+mysqlclient = "*"
 
 [dev-packages]
 flake8 = "*"
