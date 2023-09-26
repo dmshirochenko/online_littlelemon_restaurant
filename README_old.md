@@ -3,6 +3,29 @@
 ## Project Overview
 This Django-based web application, "Little Lemon," serves as an online restaurant platform. Users can access the menu, make reservations, and discover more about the restaurant.
 
+**Preparation:**
+pipenv shell
+pipenv install 
+
+**Run your Mysql server with follwing connection settings:**
+MY_SQL_DB_NAME='littlelemon_db'
+MY_SQL_DB_HOST='127.0.0.1'
+MY_SQL_DB_PORT='3306'
+
+IF your don't have mysql server, you can change in .env file
+DB_CHOICE='mysql' to DB_CHOICE='sqlite' so it will run with sqlite
+
+**Then made migrations:**
+python manage.py makemigrations
+python manage.py migrate
+
+**Create superuser:**
+python manage.py createsuperuser
+
+**Run server:**
+python manage.py runserver
+
+
 ## Directory Structure
 - `littlelemon/`: Main Django project folder
   - `settings.py`: Django settings

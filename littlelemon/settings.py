@@ -13,6 +13,12 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 import os
 import sys
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
+
+DB_CHOICE = os.getenv("DB_CHOICE", "sqlite")
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,11 +47,11 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # The settings for app updated for the Graded assessment
     "restaurant",
-    'LittleLemonAPI',
-    'rest_framework',
-    'django_filters',
-    'djoser',
-    'rest_framework.authtoken',
+    "LittleLemonAPI",
+    "rest_framework",
+    "django_filters",
+    "djoser",
+    "rest_framework.authtoken",
 ]
 
 MIDDLEWARE = [
@@ -83,18 +89,32 @@ WSGI_APPLICATION = "littlelemon.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+if DB_CHOICE == "mysql":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": os.getenv("MY_SQL_DB_NAME", "littlelemon_db"),
+            "USER": os.getenv("MY_SQL_DB_USER", "changeme"),
+            "PASSWORD": os.getenv("MY_SQL_DB_PASSWORD", "changeme"),
+            "HOST": os.getenv("MY_SQL_DB_HOST", "127.0.0.1"),
+            "PORT": os.getenv("MY_SQL_DB_PORT", "3306"),
+        }
     }
-}
+elif DB_CHOICE == "sqlite":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
+else:
+    raise ValueError("Invalid DB_CHOICE value")
 
 # for tests.py
-if 'test' in sys.argv:
-    DATABASES['default'] = {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ':memory:',
+if "test" in sys.argv:
+    DATABASES["default"] = {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": ":memory:",
     }
 
 
@@ -149,31 +169,29 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 REST_FRAMEWORK = {
-    'DEFAULT_FILTER_BACKENDS': [
-        'django_filters.rest_framework.DjangoFilterBackend',
-        'rest_framework.filters.OrderingFilter',
-        'rest_framework.filters.SearchFilter',
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend",
+        "rest_framework.filters.OrderingFilter",
+        "rest_framework.filters.SearchFilter",
     ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10,
-    'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.AnonRateThrottle',
-        'rest_framework.throttling.UserRateThrottle',
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 10,
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
     ],
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
         "rest_framework.permissions.DjangoModelPermissions",
     ],
-    'DEFAULT_THROTTLE_RATES': {
-        'anon': '100/minute',
-        'user': '100/minute',
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "100/minute",
+        "user": "100/minute",
     },
 }
 
-DJOSER = {
-    'USER_ID_FIELD': 'username'
-}
+DJOSER = {"USER_ID_FIELD": "username"}

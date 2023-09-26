@@ -1,0 +1,32 @@
+/* Flexbox layout for date picker and button */
+.form-control {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  /* Date picker style */
+  #datePicker {
+    flex: 1;
+    margin-right: 20px;
+  }
+  
+  /* Button styling */
+  #fetchButton {
+    padding: .5rem 1rem;
+    border: 1px solid #495E57;
+    background-color:#495E57;;
+    border-radius: 5px;
+    width: 30%;
+    font-size: 1.25rem;
+    display: block;
+    color: #fff;
+    line-height: 25px;
+  }
+
+  
+  /* Loader style (if needed) */
+  #loader {
+    display: none;
+  }
+  

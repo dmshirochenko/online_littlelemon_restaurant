@@ -123,7 +123,7 @@ input{
     box-sizing: border-box;
 }
 
-#button {
+#button{
     padding: .5rem 1rem;
     border: 1px solid #495E57;
     background-color:#495E57;;
