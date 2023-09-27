@@ -14,6 +14,15 @@ class MenuItemSerializer(serializers.ModelSerializer):
         model = MenuItem
         fields = "__all__"
 
+    def create(self, validated_data):
+        category_id = validated_data.get('category', None)
+        if category_id:
+            try:
+                Category.objects.get(id=category_id.id)
+            except Category.DoesNotExist:
+                raise serializers.ValidationError({"category": "Category does not exist"})
+        return MenuItem.objects.create(**validated_data)
+
 
 class CartSerializer(serializers.ModelSerializer):
     class Meta:
