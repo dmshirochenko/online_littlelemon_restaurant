@@ -47,6 +47,23 @@ class MenuItemListView(generics.ListCreateAPIView):
 
         return [permission() for permission in permission_classes]
 
+    def create(self, request, *args, **kwargs):
+        if not request.user.is_superuser:
+            return Response(
+                {"detail": "You do not have permission to perform this action."}, status=status.HTTP_403_FORBIDDEN
+            )
+
+        category_id = request.data.get("category", None)
+
+        if not Category.objects.filter(id=category_id).exists():
+            return Response({"detail": "Category does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
 
 class MenuItemDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = MenuItem.objects.all()
