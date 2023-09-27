@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 from rest_framework.authtoken.models import Token
 
-from .models import Category, MenuItem
+from .models import Category, MenuItem, Cart, Order
 from .serializers import CategorySerializer, MenuItemSerializer, UserSerializer
 from .views import GroupViewSet, DeliveryCrewViewSet
 
@@ -125,3 +125,78 @@ class DeliveryCrewViewSetTest(APITestCase):
         response = self.client.delete(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["message"], "user removed from the delivery crew group")
+
+
+class CartOperationsViewTestCase(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="testpass")
+        self.client.force_authenticate(user=self.user)
+        category = Category.objects.create(title="Category1", slug="category1")
+        self.menu_item = MenuItem.objects.create(title="Item1", price=10, featured=False, category=category)
+        self.cart_url = reverse("cart_operations")
+
+    def test_add_item_to_cart(self):
+        data = {"menuitem": self.menu_item.id, "quantity": 2}
+        response = self.client.post(self.cart_url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Check if data is correctly saved in the database
+        self.assertEqual(Cart.objects.count(), 1)
+
+    def test_add_invalid_item_to_cart(self):
+        data = {"menuitem": 999, "quantity": 2}
+        response = self.client.post(self.cart_url, data)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_cart(self):
+        response = self.client.get(self.cart_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_clear_cart(self):
+        # First add an item to the cart
+        data = {"menuitem": self.menu_item.id, "quantity": 2}
+        self.client.post(self.cart_url, data)
+
+        # Then try to clear the cart
+        response = self.client.delete(self.cart_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Check if cart is actually cleared
+        self.assertEqual(Cart.objects.count(), 0)
+
+    def test_unauthorized_access(self):
+        # Unauthenticate the client
+        self.client.force_authenticate(user=None)
+
+        # Attempt to access cart
+        response = self.client.get(self.cart_url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class OrderOperationsViewTestCase(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="testpass")
+        self.delivery_crew = User.objects.create_user(username="delivery_crew", password="testpass")
+        delivery_crew_group = Group.objects.create(name="Delivery_Crew")
+        self.delivery_crew.groups.add(delivery_crew_group)
+
+        self.client.force_authenticate(user=self.user)
+        category = Category.objects.create(title="Category1", slug="category1")
+        self.menu_item = MenuItem.objects.create(title="Item1", price=10, featured=False, category=category)
+        self.cart = Cart.objects.create(user=self.user, menuitem=self.menu_item, quantity=1, unit_price=10, price=10)
+        self.order_url = reverse("order_operations")
+
+    def test_list_orders(self):
+        response = self.client.get(self.order_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_create_order(self):
+        data = {"date": "2023-12-31"}
+        response = self.client.post(self.order_url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_create_order_empty_cart(self):
+        self.cart.delete()
+        data = {"date": "2023-12-31"}
+        response = self.client.post(self.order_url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
