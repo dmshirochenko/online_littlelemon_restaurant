@@ -7,7 +7,8 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from .forms import BookingForm
-from .models import Menu, Booking
+from .models import Booking
+from LittleLemonAPI.models import MenuItem
 
 
 def home(request):
@@ -35,18 +36,16 @@ def reservation(request):
 
 
 def menu(request):
-    menu_data = Menu.objects.all()  # Fetch all menu items from the database
-    main_data = {"menu": menu_data}  # Create dictionary with key-value pair
-
-    return render(request, "menu.html", main_data)  # Render menu.html template with main_data
+    menu_data = MenuItem.objects.all()
+    main_data = {"menu": menu_data}
+    return render(request, "menu.html", main_data)
 
 
 def display_menu_items(request, pk=None):
     if pk:
-        menu_item = Menu.objects.get(pk=pk)  # Retrieve menu item by primary key
+        menu_item = MenuItem.objects.get(pk=pk)
     else:
-        menu_item = ""  # Empty string if no primary key is provided
-
+        menu_item = ""
     return render(request, "menu_item.html", {"menu_item": menu_item})
 
 

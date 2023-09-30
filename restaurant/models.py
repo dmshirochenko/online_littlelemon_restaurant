@@ -8,12 +8,3 @@ class Booking(models.Model):
 
     def __str__(self):
         return self.first_name
-
-
-class Menu(models.Model):
-    name = models.CharField(max_length=200)
-    price = models.IntegerField()
-    description = models.TextField(max_length=1000, default="")
-
-    def __str__(self):
-        return self.name
