@@ -110,3 +110,8 @@ This application provides a RESTful API with the following endpoints.
 
 Unit tests are available in LittleLemonAPI/tests.py.
 
+---
+
+### Contributing
+
+Contributions are welcome. Feel free to open a pull request or issue on GitHub.
