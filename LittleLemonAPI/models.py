@@ -13,6 +13,7 @@ class Category(models.Model):
 class MenuItem(models.Model):
     title = models.CharField(max_length=255, db_index=True)
     price = models.DecimalField(max_digits=6, decimal_places=2, db_index=True)
+    description = models.TextField(max_length=1000, null=True, blank=True, db_index=False)
     featured = models.BooleanField(db_index=True)
     is_item_of_the_day = models.BooleanField(default=False, db_index=True)
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
