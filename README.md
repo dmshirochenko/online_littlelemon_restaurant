@@ -1,56 +1,33 @@
-## Project Overview
+## Online Little Lemon Restaurant Platform 🐍Django 📡DjangoDRF 🔐Djoser 🐳Docker 🛢MySQL 🌐API 🧪UnitTest
 
-This Django-based web application, "Little Lemon," serves as an online restaurant platform. Users can access the menu, make reservations, and discover more about the restaurant.
+### Overview
 
-**Endpoints for Testing**
+The "Little Lemon" is a comprehensive web application for restaurant management, providing a real-time menu, table bookings, and more.
 
-1. Does the web application use Django to serve static HTML content?
-   - Directory: `restaurant/static`
+---
 
-2. Has the learner committed the project to a Git repository?
-   - Repository: [GitHub - online_littlelemon_restaurant](https://github.com/dmshirochenko/online_littlelemon_restaurant)
+### Table of Contents
 
-3. Does the application connect the backend to a MySQL database?
-   - Configuration: `littlelemon/settings.py`
+1. [Features](#features)
+2. [Installation](#installation)
+3. [Endpoints](#endpoints)
+5. [Tests](#tests)
+6. [Contributing](#contributing)
 
-4. Are the menu and table booking APIs implemented?
-   - **Menu**
-     - Get Menu Items: `GET http://127.0.0.1:8000/api/menu-items`
-     - Create Menu Item (Superuser only, category must exist):
-       ```json
-       POST http://127.0.0.1:8000/api/menu-items
-       {
-           "title": "New item",
-           "price": 12,
-           "featured": false,
-           "is_item_of_the_day": false,
-           "category": 1
-       }
-       ```
-   - **Booking**
-     - Create Booking:
-       ```json
-       POST http://127.0.0.1:8000/bookings/
-       {
-           "first_name": "John",
-           "reservation_date": "2023-09-28",
-           "reservation_slot": "11"
-       }
-       ```
-     - Check Bookings:
-       `GET http://127.0.0.1:8000/bookings/?date=2023-09-28`
+---
 
-5. Is the application set up with user registration and authentication?
-   - Registration: `http://127.0.0.1:8000/auth/users/`
-   - Login: `http://127.0.0.1:8000/auth/token/login/`
+### Features
 
-6. Does the application contain unit tests?
-   - Test File: `LittleLemonAPI/tests.py`
+- Real-time Menu Management
+- Table Reservation API
+- User Authentication and Authorization
+- Unit Tests
+- MySQL Database Backend
+- RESTful API
 
-7. Can the API be tested with the Insomnia REST client?
-   - Yes
+---
 
-**Installation:**
+### Installation
 
 ```shell
 # Activate the virtual environment
@@ -59,22 +36,77 @@ pipenv shell
  Install dependencies
 pipenv install
 
-**Run your MySQL server with the following connection settings:**
-
+Run your MySQL server with the following connection settings:
 MY_SQL_DB_NAME='littlelemon_db'
 MY_SQL_DB_HOST='127.0.0.1'
 MY_SQL_DB_PORT='3306'
 
 
-IF your don't have mysql server, you can change in .env file
+You can run it with sqlite as well, change in .env file:
 DB_CHOICE='mysql' to DB_CHOICE='sqlite' so it will run with sqlite
 
-**Then made migrations:**
+Then made migrations:
 python manage.py makemigrations
 python manage.py migrate
 
-**Create superuser:**
+Create superuser:
 python manage.py createsuperuser
 
-**Run server:**
+Run server:
 python manage.py runserver
+```
+---
+
+### Endpoints
+
+This application provides a RESTful API with the following endpoints.
+
+#### Menu Operations
+
+- **List Menu Items:**  
+  `GET /menu-items`
+
+- **View Single Menu Item:**  
+  `GET /menu-items/<int:pk>`
+
+- **Update Item of the Day:**  
+  `POST /item-of-the-day/update/<int:pk>`
+
+#### Category Operations
+
+- **List Categories:**  
+  `GET /categories`
+
+#### Cart Operations
+
+- **Perform Operations on Cart:**  
+  `POST /cart/menu-items`
+
+#### Order Operations
+
+- **Create or List Orders:**  
+  `POST /orders`
+
+- **View Single Order:**  
+  `GET /orders/<int:pk>`
+
+- **Assign Order to Delivery Crew:**  
+  `POST /orders/assign`
+
+- **Mark Order as Delivered:**  
+  `POST /orders/mark-delivered/<int:pk>`
+
+#### User Management
+
+- **List, Create, or Delete Managers:**  
+  `GET, POST, DELETE /groups/manager/users`
+
+- **List, Create, or Delete Delivery Crew Members:**  
+  `GET, POST, DELETE /groups/delivery-crew/users`
+
+---
+
+### Tests
+
+Unit tests are available in LittleLemonAPI/tests.py.
+
