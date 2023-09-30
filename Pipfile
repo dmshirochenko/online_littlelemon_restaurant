@@ -10,6 +10,7 @@ django-filter = "*"
 djoser = "*"
 python-dotenv = "*"
 mysqlclient = "*"
+django-split-settings = "*"
 
 [dev-packages]
 flake8 = "*"
