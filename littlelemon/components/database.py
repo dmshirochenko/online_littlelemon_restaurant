@@ -7,11 +7,11 @@ if DB_CHOICE == "mysql":
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.mysql",
-            "NAME": os.getenv("MY_SQL_DB_NAME", "littlelemon_db"),
+            "NAME": os.getenv("MYSQL_DATABASE", "littlelemon_db"),
             "USER": os.getenv("MY_SQL_DB_USER", "changeme"),
-            "PASSWORD": os.getenv("MY_SQL_DB_PASSWORD", "changeme"),
-            "HOST": os.getenv("MY_SQL_DB_HOST", "127.0.0.1"),
-            "PORT": os.getenv("MY_SQL_DB_PORT", "3306"),
+            "PASSWORD": os.getenv("MYSQL_PASSWORD", "changeme"),
+            "HOST": os.getenv("MYSQL_HOST", "127.0.0.1"),
+            "PORT": os.getenv("MYSQL_PORT", "3306"),
         }
     }
 elif DB_CHOICE == "sqlite":
