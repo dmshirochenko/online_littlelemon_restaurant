@@ -11,6 +11,7 @@ djoser = "*"
 python-dotenv = "*"
 mysqlclient = "*"
 django-split-settings = "*"
+psycopg2-binary = "*"
 
 [dev-packages]
 flake8 = "*"
