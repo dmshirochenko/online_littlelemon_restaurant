@@ -10,5 +10,22 @@ services:
     volumes:
       - my-db-data:/var/lib/mysql
 
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    expose:
+      - "5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./postgres_instance/data:/var/lib/postgresql/data
+
 volumes:
   my-db-data:

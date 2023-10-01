@@ -8,10 +8,21 @@ if DB_CHOICE == "mysql":
         "default": {
             "ENGINE": "django.db.backends.mysql",
             "NAME": os.getenv("MYSQL_DATABASE", "littlelemon_db"),
-            "USER": os.getenv("MY_SQL_DB_USER", "changeme"),
+            "USER": os.getenv("MYSQL_USER", "changeme"),
             "PASSWORD": os.getenv("MYSQL_PASSWORD", "changeme"),
             "HOST": os.getenv("MYSQL_HOST", "127.0.0.1"),
             "PORT": os.getenv("MYSQL_PORT", "3306"),
+        }
+    }
+elif DB_CHOICE == "postgres":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.environ.get("POSTGRES_DB"),
+            "USER": os.environ.get("POSTGRES_USER"),
+            "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
+            "HOST": os.environ.get("POSTGRES_HOST", "127.0.0.1"),
+            "PORT": os.environ.get("POSTGRES_PORT", 5432),
         }
     }
 elif DB_CHOICE == "sqlite":
