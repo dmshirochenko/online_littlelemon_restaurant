@@ -31,7 +31,7 @@ jobs:
     - name: Install Poetry
       run: pip install poetry
     - name: Install Dependencies
-      run: ppoetry install --no-dev
+      run: poetry install --no-dev
     - name: Run Migrations
       run: poetry run python manage.py migrate
     - name: Inject secrets into environment
