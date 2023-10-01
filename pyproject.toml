@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "littlelemon"
+version = "0.1.0"
+description = "Online little lemon restaurant site"
+authors = ["Dmitriy Shirochenko <dmshirochenko@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "3.7.*"
+django = "*"
+djangorestframework = "*"
+django-filter = "*"
+djoser = "*"
+python-dotenv = "*"
+mysqlclient = "*"
+django-split-settings = "*"
+psycopg2-binary = "*"
+
+[tool.poetry.dev-dependencies]
+flake8 = "*"
+black = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
