@@ -8,34 +8,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Install Python 3.11
+    - name: Install Python 3.7
       uses: actions/setup-python@v2
       with:
-        python-version: '3.11'
+        python-version: '3.7'
+    - name: Install Poetry
+      run: pip install poetry
     - name: Install Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pipenv
-        pipenv install --dev
+      run: poetry install
     - name: Run Flake8
-      run: pipenv run flake8 .
+      run: poetry run flake8 .
 
   test:
     name: Django Test and Migrate
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Install Python 3.11
+    - name: Install Python 3.7
       uses: actions/setup-python@v2
       with:
-        python-version: '3.11'
+        python-version: '3.7'
+    - name: Install Poetry
+      run: pip install poetry
     - name: Install Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pipenv
-        pipenv install
+      run: poetry install --no-dev
     - name: Run Migrations
-      run: pipenv run python manage.py migrate
+      run: poetry run python manage.py migrate
     - name: Inject secrets into environment
       env:
         TEST_SUPERUSER_NAME: ${{ secrets.TEST_SUPERUSER_NAME }}
@@ -44,4 +42,4 @@ jobs:
         echo "TEST_SUPERUSER_NAME=${TEST_SUPERUSER_NAME}" >> $GITHUB_ENV
         echo "TEST_SUPERUSER_PASSWORD=${TEST_SUPERUSER_PASSWORD}" >> $GITHUB_ENV
     - name: Run Tests
-      run: pipenv run python manage.py test
+      run: poetry run python manage.py test
