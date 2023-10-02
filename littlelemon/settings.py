@@ -70,6 +70,7 @@ if os.environ.get("RENDER"):
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
     DEBUG = False
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 MEDIA_URL = "/media/"
