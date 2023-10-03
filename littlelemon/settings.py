@@ -70,7 +70,6 @@ if os.environ.get("RENDER"):
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
     DEBUG = False
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 MEDIA_URL = "/media/"
@@ -79,6 +78,8 @@ MEDIA_URL = "/media/"
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = "restaurant/static/"
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_DIRS = [
     "restaurant/static",

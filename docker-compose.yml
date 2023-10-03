@@ -4,11 +4,13 @@ services:
   db:
     image: mysql:8.0
     env_file:
-      - ./.env
+      - .env
     ports:
       - "3306:3306"
     volumes:
       - my-db-data:/var/lib/mysql
+    networks:
+      - littlelemon_network
 
   postgres:
     image: postgres:13
@@ -26,6 +28,34 @@ services:
       retries: 5
     volumes:
       - ./postgres_instance/data:/var/lib/postgresql/data
+    networks:
+      - littlelemon_network
+
+  littlelemon_django:
+    container_name: littlelemon_django
+    build: .
+    env_file:
+      - .env
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --silent ${DJANGO_HOST}:${DJANGO_PORT} >/dev/null || exit 1" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    expose:
+      - "8000"
+    volumes:
+      - ./littlelemon/staticfiles:/opt/app/staticfiles:rw
+    networks:
+      - littlelemon_network
+
 
 volumes:
   my-db-data:
+
+networks:
+  littlelemon_network:

@@ -40,3 +40,5 @@ build/
 #Custom
 guidline_to_follow.md
 postgres_instance/
+my-db-data/
+staticfiles/
