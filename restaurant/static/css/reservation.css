@@ -1,32 +1,79 @@
 /* Flexbox layout for date picker and button */
 .form-control {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  /* Date picker style */
-  #datePicker {
-    flex: 1;
-    margin-right: 20px;
-  }
-  
-  /* Button styling */
-  #fetchButton {
-    padding: .5rem 1rem;
-    border: 1px solid #495E57;
-    background-color:#495E57;;
-    border-radius: 5px;
-    width: 30%;
-    font-size: 1.25rem;
-    display: block;
-    color: #fff;
-    line-height: 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px; /* consistent spacing between elements */
+}
+
+/* Date picker style */
+#datePicker {
+  flex: 1;
+  padding: .5rem 1rem;
+  border: 1px solid #495E57;
+  border-radius: 5px;
+  background-color: #f4f4f4;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+/* Button styling */
+#fetchButton {
+  padding: .5rem 1rem;
+  background: linear-gradient(145deg, #3a4e48, #517866); /* subtle gradient */
+  border: none;
+  border-radius: 5px;
+  width: 30%;
+  font-size: 1.25rem;
+  color: #fff;
+  cursor: pointer;
+  transition: transform .2s, background-color .3s; /* smooth transition */
+}
+
+#fetchButton:hover {
+  background-color: #3a4e48; /* slightly darker on hover */
+}
+
+#fetchButton:active {
+  transform: scale(0.97); /* subtle "push" effect on click */
+}
+
+/* Loader style (if needed) */
+#loader {
+  display: none;
+}
+
+/* Media Queries for Responsive Design */
+
+/* For mobile devices and tablets */
+@media only screen and (max-width: 768px) {
+  /* Make columns stack on top of each other */
+  .column {
+      width: 100%;
+      display: block;
   }
 
-  
-  /* Loader style (if needed) */
-  #loader {
-    display: none;
+  /* Date picker and button should occupy full width */
+  #datePicker, #fetchButton {
+      width: 100%;
+      margin: 5px 0;
   }
-  
+
+  .form-control {
+      flex-direction: column;
+  }
+}
+
+/* For larger desktops */
+@media only screen and (min-width: 769px) {
+  /* Two columns layout side by side */
+  .row {
+      display: flex;
+      justify-content: space-between;
+  }
+
+  .column {
+      flex: 1;
+      padding: 0 15px; /* Some spacing between columns */
+  }
+}
