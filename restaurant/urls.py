@@ -13,4 +13,6 @@ urlpatterns = [
     path("menu_item/", views.display_menu_items, name="menu_item_no_pk"),
     # Bookings
     path("bookings/", views.bookings, name="bookings"),
+    # Registration form
+    path('register/', views.register, name='register'),
 ]

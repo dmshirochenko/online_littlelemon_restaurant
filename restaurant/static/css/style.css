@@ -47,10 +47,9 @@ header img {
 
 
 nav {
-    background-color: #495E57;
+    background: linear-gradient(145deg, #3a4e48, #517866); /* subtle gradient */
     margin-top: 1rem;
-    margin-bottom: 1rem;
-    margin-bottom: 0px;
+    margin-bottom: 1rem; 
 }
 
 nav ul {
@@ -253,3 +252,18 @@ footer p {
         width: 100%;
     }
   }
+
+.form-styling {
+    background: #EDEFEE;
+    padding: 1rem;
+    border: 1px solid #495E57;
+}
+
+.message-box {
+    font-family: 'Karla', sans-serif;
+    font-size: 1.25rem;
+    color: #333333;
+    border: 1px solid #EDEFEE;
+    padding: .5rem;
+    margin-top: 1rem;
+}

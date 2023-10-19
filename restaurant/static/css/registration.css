@@ -1,0 +1,98 @@
+body {
+    font-family: 'Karla', sans-serif;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+    margin-left: 5%;
+    margin-right: 5%;
+}
+
+.container {
+    width: 90%;
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background-color: #fff;
+    font-family: 'Karla', sans-serif !important;
+}
+
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #555;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+button {
+    width: 100%;
+    padding: 10px 15px;
+    background: linear-gradient(145deg, #3a4e48, #517866);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-image 0.3s;
+}
+
+button:hover {
+    background-image: linear-gradient(145deg, #2a3e38, #406656);
+}
+
+.message-box {
+    margin-top: 15px;
+    padding: 10px;
+    border: 1px solid;
+    display: none; 
+}
+
+.message-box.error {
+    border-color: #dc3545;
+    color: #dc3545;
+    background-color: #f8d7da;
+}
+
+.message-box.success {
+    border-color: #28a745;
+    color: #28a745;
+    background-color: #d4edda;
+}
+
+/* Media Queries for Responsive Design */
+@media only screen and (max-width: 480px) {
+    /* Adjust font sizes and paddings for better readability on smaller devices */
+    h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+    }
+
+    .input-group input {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    button {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+}
