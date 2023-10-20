@@ -15,4 +15,6 @@ urlpatterns = [
     path("bookings/", views.bookings, name="bookings"),
     # Registration form
     path('register/', views.register, name='register'),
+    # Login form
+    path('login/', views.user_login, name='user_login'),
 ]

@@ -23,6 +23,10 @@ def register(request):
     return render(request, 'registration.html')
 
 
+def user_login(request):
+    return render(request, 'login.html')
+
+
 def book(request):
     form = BookingForm()
     if request.method == "POST":
