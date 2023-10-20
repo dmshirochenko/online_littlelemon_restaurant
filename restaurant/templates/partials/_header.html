@@ -1,6 +1,7 @@
 {% load static %}
 <header>
   <img src="{% static 'img/logo.png' %}" />
+  <script src="{% static 'js/is_logged.js' %}"></script>
 </header>
 <nav>
   <ul>
@@ -9,5 +10,10 @@
     <li><a href="{% url 'menu' %}">Menu</a></li>
     <li><a href="{% url 'book' %}">Book</a></li>
     <li><a href="{% url 'reservations' %}">Reservations</a></li>
+    <li id="user-info" class="user-section"></li>
+    <!-- Hidden divs for the URLs -->
+    <span id="register-url" hidden>{% url 'register' %}</span>
+    <span id="login-url" hidden>{% url 'user_login' %}</span>
+    <span id="logout-url" hidden>{% url 'logout' %}</span>
   </ul>
 </nav>

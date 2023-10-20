@@ -37,10 +37,10 @@ document.addEventListener('DOMContentLoaded', (event) => {
             messageBox.style.display = 'block';  // make it visible
             messageBox.classList.add('success');
             
-            const homeUrl = document.getElementById('homeUrl').value;
+            const loginUrl = document.getElementById('loginUrl').value;
             
             setTimeout(() => {
-                window.location.href = homeUrl; // adjust the path as required
+                window.location.href = loginUrl; // adjust the path as required
             }, 2000); // waits 2 seconds before redirecting
         })
         .catch(error => {
