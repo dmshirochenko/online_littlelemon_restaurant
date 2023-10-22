@@ -1,15 +1,92 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block content %}
 <h1>Menu</h1>
 <div class="column">
     {% for item in menu %}
-    <p>
-        <a href="{% url 'menu_item' pk=item.pk %}">
-            {{ item.title }}
-        </a>
-        <span class="menu-price">${{ item.price }}</span>
-    </p>
+    <div class="food-item">
+        <h3>
+            <a href="{% url 'menu_item' pk=item.pk %}">
+                {{ item.title }}
+            </a>
+        </h3>
+    <span class="menu-item">
+        <span class="menu-price">Price: ${{ item.price }}</span>
+
+        <!-- Quantity Selector -->
+        <div class="component-container">
+            <button class="minus-button" onclick="updateQuantity('decrement', item_{{ item.pk }})">−</button>
+            <span class="quantity-display" id="quantity_{{ item.pk }}">1</span>
+            <button class="plus-button" onclick="updateQuantity('increment', item_{{ item.pk }})">+</button>
+            <button class="action-button" onclick="addToBasket(item_{{ item.pk }})">Add 1 for ${{ item.price }}</button>
+        </div>
+    </span>
+
+        <script type="application/javascript">
+            let item_{{ item.pk }} = {
+                menuitem: {{ item.pk }},
+                title: "{{ item.title }}",
+                unit_price: {{ item.price }},
+                quantity: parseInt(document.getElementById('quantity_{{ item.pk }}').textContent, 10),
+                get price() {
+                    return this.unit_price * this.quantity;
+                }
+            };
+        </script>
+    </div>
     {% endfor %}
 </div>
+
+<script>
+
+function updateQuantity(action, item) {
+        const quantityDisplay = document.getElementById('quantity_' + item.menuitem);
+        let quantity = parseInt(quantityDisplay.textContent);
+        if (action === 'decrement' && quantity > 1) {
+            quantity--;
+        } else if (action === 'increment') {
+            quantity++;
+        }
+        quantityDisplay.textContent = quantity;
+        item.quantity = quantity;
+        const actionButton = quantityDisplay.closest('.component-container').querySelector('.action-button');
+        actionButton.textContent = `Add ${quantity} for $${(item.unit_price * quantity).toFixed(2)}`;
+    }
+
+
+function addToBasket(item) {
+    const authToken = sessionStorage.getItem('token');
+
+    if (authToken) {
+        // Authenticated User: Add to server-side basket
+        fetch('{% url 'cart_operations' %}', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Token ${authToken}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ menuitem: item.menuitem, quantity: item.quantity })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle authenticated user response
+        })
+        .catch((error) => console.error('Error:', error));
+    } 
+    else {
+    let clientBasket = JSON.parse(localStorage.getItem('clientBasket')) || [];
+    const existingItem = clientBasket.find(existing => existing.menuitem === item.menuitem);
+
+    if (existingItem) {
+        existingItem.quantity += item.quantity; // Add the new selected quantity to the existing item
+        existingItem.price = existingItem.unit_price * existingItem.quantity; // Update total price
+    } else {
+        clientBasket.push(item);
+    }
+
+    localStorage.setItem('clientBasket', JSON.stringify(clientBasket));
+}
+}
+</script>
 {% endblock %}

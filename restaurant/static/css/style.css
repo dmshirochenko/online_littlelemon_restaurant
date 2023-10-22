@@ -299,3 +299,79 @@ footer p {
     padding: .5rem;
     margin-top: 1rem;
 }
+
+/* Menu item  */
+.menu-item {
+    display: flex;
+    align-items: center;
+}
+
+.menu-price {
+    margin-right: 1rem;
+}
+
+/* Container holding the entire component */
+.component-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #F5F5F7; /* Light gray */
+    padding: 10px 20px;
+    border-radius: 50px;
+    width: 300px; /* Adjust as needed */
+}
+
+/* Quantity Selector - Minus Button */
+.component-container .minus-button, 
+.component-container .plus-button {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    background-color: #E0E0E3; /* Lighter gray */
+    transition: background-color 0.3s;
+}
+
+/* Quantity Selector - Plus Button */
+.component-container .plus-button {
+    background-color: #6ED2A7; /* Light teal */
+    margin-right: 10px; 
+}
+
+.component-container .minus-button:hover,
+.component-container .plus-button:hover {
+    background-color: #D1D1D6; /* Slightly darker gray on hover */
+}
+
+.component-container .plus-button:hover {
+    background-color: #59BA8C; /* Darker teal on hover */
+}
+
+/* Quantity Display */
+.component-container .quantity-display {
+    font-size: 18px;
+    margin: 0 20px;
+    width: 25px;
+    text-align: center;
+}
+
+/* Action Button */
+.component-container .action-button {
+    flex-grow: 1;
+    height: 40px;
+    background-color: #C7C7CC; /* Gray */
+    border: none;
+    border-radius: 25px; /* Half of height to get pill shape */
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    
+}
+
+.component-container .action-button:hover {
+    background-color: #B0B0B5; /* Slightly darker gray on hover */
+}
