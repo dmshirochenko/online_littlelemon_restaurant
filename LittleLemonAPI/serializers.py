@@ -25,10 +25,12 @@ class MenuItemSerializer(serializers.ModelSerializer):
 
 
 class CartSerializer(serializers.ModelSerializer):
+    menuitem_details = MenuItemSerializer(source='menuitem', read_only=True)
+
     class Meta:
         model = Cart
-        fields = "__all__"
-
+        fields = ['id', 'quantity', 'unit_price', 'price', 'user', 'menuitem', 'menuitem_details']
+        
 
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
