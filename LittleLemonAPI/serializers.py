@@ -15,7 +15,7 @@ class MenuItemSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def create(self, validated_data):
-        category_id = validated_data.get('category', None)
+        category_id = validated_data.get("category", None)
         if category_id:
             try:
                 Category.objects.get(id=category_id.id)
@@ -25,12 +25,12 @@ class MenuItemSerializer(serializers.ModelSerializer):
 
 
 class CartSerializer(serializers.ModelSerializer):
-    menuitem_details = MenuItemSerializer(source='menuitem', read_only=True)
+    menuitem_details = MenuItemSerializer(source="menuitem", read_only=True)
 
     class Meta:
         model = Cart
-        fields = ['id', 'quantity', 'unit_price', 'price', 'user', 'menuitem', 'menuitem_details']
-        
+        fields = ["id", "quantity", "unit_price", "price", "user", "menuitem", "menuitem_details"]
+
 
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:

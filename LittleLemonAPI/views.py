@@ -136,50 +136,50 @@ class CartOperationsView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Cart.objects.filter(user=self.request.user).select_related('menuitem')
+        return Cart.objects.filter(user=self.request.user).select_related("menuitem")
 
     def post(self, request, *args, **kwargs):
-            menu_item_id = request.data.get("menuitem")
-            menu_item = get_object_or_404(MenuItem, id=menu_item_id)
+        menu_item_id = request.data.get("menuitem")
+        menu_item = get_object_or_404(MenuItem, id=menu_item_id)
 
-            unit_price = float(menu_item.price)
-            quantity = int(request.data.get("quantity"))
-            
-            # Find existing basket item
-            existing_item = Cart.objects.filter(user=request.user.id, menuitem=menu_item.id).first()
+        unit_price = float(menu_item.price)
+        quantity = int(request.data.get("quantity"))
 
-            if existing_item:
-                # Update existing item
-                existing_item.quantity = F('quantity') + quantity  # Using F() for atomic update
-                existing_item.save(update_fields=['quantity'])
-                existing_item.refresh_from_db()
-                
-                # Now update price based on updated quantity
-                existing_item.price = existing_item.unit_price * existing_item.quantity  
-                existing_item.save(update_fields=['price'])
+        # Find existing basket item
+        existing_item = Cart.objects.filter(user=request.user.id, menuitem=menu_item.id).first()
 
-                # Reload to get updated values
-                existing_item.refresh_from_db()
+        if existing_item:
+            # Update existing item
+            existing_item.quantity = F("quantity") + quantity  # Using F() for atomic update
+            existing_item.save(update_fields=["quantity"])
+            existing_item.refresh_from_db()
 
-                serializer = self.serializer_class(existing_item)
+            # Now update price based on updated quantity
+            existing_item.price = existing_item.unit_price * existing_item.quantity
+            existing_item.save(update_fields=["price"])
+
+            # Reload to get updated values
+            existing_item.refresh_from_db()
+
+            serializer = self.serializer_class(existing_item)
+        else:
+            # Create new basket item
+            total_price = unit_price * quantity
+            data = {
+                "user": request.user.id,
+                "menuitem": menu_item.id,
+                "quantity": quantity,
+                "unit_price": unit_price,
+                "price": total_price,
+            }
+
+            serializer = self.serializer_class(data=data)
+            if serializer.is_valid():
+                serializer.save()
             else:
-                # Create new basket item
-                total_price = unit_price * quantity
-                data = {
-                    "user": request.user.id,
-                    "menuitem": menu_item.id,
-                    "quantity": quantity,
-                    "unit_price": unit_price,
-                    "price": total_price
-                }
-                
-                serializer = self.serializer_class(data=data)
-                if serializer.is_valid():
-                    serializer.save()
-                else:
-                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete(self, request, *args, **kwargs):
         Cart.objects.all().filter(user=self.request.user).delete()
