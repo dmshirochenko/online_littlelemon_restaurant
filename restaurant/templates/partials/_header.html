@@ -15,5 +15,12 @@
     <span id="register-url" hidden>{% url 'register' %}</span>
     <span id="login-url" hidden>{% url 'user_login' %}</span>
     <span id="logout-url" hidden>{% url 'logout' %}</span>
+  </li>
   </ul>
 </nav>
+
+<div class="floating-cart">
+  <a href="{% url 'basket' %}">
+    <img src="{% static 'img/cart_icon.png' %}" alt="Cart" class="cart-icon" />
+  </a>
+</div>

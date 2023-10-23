@@ -375,3 +375,28 @@ footer p {
 .component-container .action-button:hover {
     background-color: #B0B0B5; /* Slightly darker gray on hover */
 }
+
+/* Cart item */
+.floating-cart {
+    position: fixed;  /* Fixed positioning makes it float */
+    top: 2%;          /* From the top of the page */
+    right: 2%;        /* From the right side of the page */
+    width: 50px;      /* Width of the circle */
+    height: 50px;     /* Height of the circle */
+    border-radius: 50%;  /* Makes it a circle */
+    background-color: #2e3f37;  /* Background color of the circle */
+    display: flex;  
+    justify-content: center;  /* Horizontally center the icon */
+    align-items: center;      /* Vertically center the icon */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);  /* Optional: Adds a subtle shadow */
+    transition: background-color 0.3s ease;  /* Smooth transition for hover effect */
+}
+
+.floating-cart:hover {
+    background-color: #25342c;
+}
+
+.cart-icon {
+    width: 95%;   /* Adjust icon size to make it bigger */
+    height: auto; /* Maintain aspect ratio */
+}
