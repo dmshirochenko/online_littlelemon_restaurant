@@ -24,6 +24,12 @@ h2 {
     margin:1rem 0;
 }
 
+h3 {
+    font-size: 1.5rem;
+    margin:1rem 0;
+}
+
+
 p, ul{
     font-size: 1.25rem;;
 }
@@ -266,6 +272,8 @@ footer p {
     font-size: 1rem;
 }
 
+
+
 @media (max-width: 800px) {
     section {
         flex-direction: column;   
@@ -399,4 +407,23 @@ footer p {
 .cart-icon {
     width: 95%;   /* Adjust icon size to make it bigger */
     height: auto; /* Maintain aspect ratio */
+}
+
+#overallValueLine {
+    width: 80%;   /* Adjust width as needed */
+    margin: 10px auto;   /* Center the line and provide space above and below */
+}
+
+#overallValue {
+    font-size: 1.5em;   /* Increase the font size; adjust as needed */
+    font-weight: bold;  /* Make the text bold */
+    display: block;     /* Make it a block element so it appears on its own line */
+    text-align: center; /* Center the text */
+    margin: 10px 0;     /* Provide some margin above and below for spacing */
+}
+
+.basket-price-total {
+    font-size: 1.2em;   /* Increase the font size; adjust as needed */
+    font-weight: bold;  /* Make the text bold for emphasis */
+    margin: 10px 0;     /* Provide some margin above and below for spacing */
 }
