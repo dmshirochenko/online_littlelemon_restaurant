@@ -6,7 +6,8 @@
 <div class="column">
 
     <div id="basket-container"></div> <!-- This is used for both authenticated and non-authenticated users -->
-
+    <hr id="overallValueLine">
+    <span id="overallValue"></span>
 </div>
 
 <script>
@@ -20,20 +21,69 @@ function formatBasketData(item) {
             </a>
         </h3>
         <span class="basket-info">
-            <span class="basket-price">Unit Price: $${item.unit_price}</span>
             <!-- Quantity Selector -->
             <div class="component-container">
-                <button class="minus-button" onclick="updateQuantity('decrement', item)">−</button>
+                <button class="minus-button" data-action="decrement" data-menuitem="${item.menuitem}" data-unit-price="${item.unit_price}">−</button>
                 <span class="quantity-display" id="quantity_${item.menuitem}">${item.quantity}</span>
-                <button class="plus-button" onclick="updateQuantity('increment', item)">+</button>
-                <button class="action-button" onclick="updateBasket(item)">Update $${item.price}</button>
+                <button class="plus-button" data-action="increment" data-menuitem="${item.menuitem}" data-unit-price="${item.unit_price}">+</button>
             </div>
+            <span class="basket-price-total" id="totalPrice_${item.menuitem}">Total Price per unit: $${item.price}</span>
         </span>
     `;
 }
 
+// After rendering all items, bind the event listeners
+function bindEventListeners() {
+    document.querySelectorAll('.minus-button').forEach(button => {
+        button.addEventListener('click', function() {
+            console.log("Button clicked:", this.dataset.menuitem);
+            const item = {
+                menuitem: this.dataset.menuitem,
+                unit_price: this.dataset.unitPrice,
+            };
+            updateQuantity('decrement', item);
+        });
+    });
+
+    document.querySelectorAll('.plus-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const item = {
+                menuitem: this.dataset.menuitem,
+                unit_price: this.dataset.unitPrice,
+            };
+            updateQuantity('increment', item);
+        });
+    });
+}
+
+//function to calculate Overall Value
+function calculateOverallValue() {
+    let overallValue = 0;
+
+    // Use a more specific selector to match the ID pattern
+    let items = document.querySelectorAll('[id^="totalPrice_"]'); 
+
+    items.forEach(item => {
+        let priceText = item.textContent.replace('Total Price per unit: $', '');
+        let price = parseFloat(priceText);
+        
+        // Check if price is a valid number before adding to overallValue
+        if (!isNaN(price)) {
+            overallValue += price;
+        }
+    });
+
+    if (!isNaN(overallValue) && overallValue > 0) {
+        document.getElementById('overallValue').textContent = 'Overall Value: $' + overallValue.toFixed(2);
+    } else {
+        document.getElementById('overallValue').textContent = ''; // Reset to empty if overallValue is NaN or 0
+    }
+}
+
+
 // Function to render basket items on the page
 function renderBasketItems(basketItems) {
+    console.log("basketItems ", basketItems)
     const basketContainer = document.getElementById('basket-container');
     basketItems.forEach(item => {
         const basketItem = document.createElement('div');
@@ -91,30 +141,96 @@ function fetchBasket() {
 function updateQuantity(action, item) {
     const quantityDisplay = document.getElementById('quantity_' + item.menuitem);
     let quantity = parseInt(quantityDisplay.textContent);
+
+    // Assuming you have the unit_price available in the item object
+    let unitPrice = parseFloat(item.unit_price); 
+
     if (action === 'decrement' && quantity > 1) {
         quantity--;
+        updateBasket(action, item);
     } else if (action === 'increment') {
         quantity++;
+        updateBasket(action, item);
     }
+
+    // Calculate the updated total price for the item
+    let updatedTotalPrice = quantity * unitPrice;
+
+    // Update the DOM elements
     quantityDisplay.textContent = quantity;
+    const totalPriceDisplay = document.getElementById('totalPrice_' + item.menuitem);
+    totalPriceDisplay.textContent = 'Total Price per unit: $' + updatedTotalPrice.toFixed(2);
+
+    // Update the item object
     item.quantity = quantity;
-    const actionButton = quantityDisplay.closest('.component-container').querySelector('.action-button');
-    actionButton.textContent = `Update $${(item.unit_price * quantity).toFixed(2)}`;
+    item.price = updatedTotalPrice;
+
+    // Recalculate the overall value
+    calculateOverallValue();
 }
 
-function updateBasket(item) {
+function updateBasket(action, item) {
     const authToken = sessionStorage.getItem('token');
+    item.menuitem = parseInt(item.menuitem, 10);
+    let quantity_diff = 0;
+
+    if (action === 'decrement') {
+        quantity_diff = -1;
+    } else if (action === 'increment') {
+        quantity_diff = 1;
+    }
+
+    console.log("quantity_diff", quantity_diff)
     if (authToken) {
-        // Authenticated User: Update server-side basket
-        // ... [your existing logic for authenticated users]
+        // Authenticated User: Add to server-side basket
+        
+        fetch('{% url 'cart_operations' %}', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Token ${authToken}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ menuitem: item.menuitem, quantity: quantity_diff })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle authenticated user response
+        })
+        .catch((error) => console.error('Error:', error));
+    } 
+    else {
+    let clientBasket = JSON.parse(localStorage.getItem('clientBasket')) || [];
+    const existingItem = clientBasket.find(existing => existing.menuitem === item.menuitem);
+
+    if (existingItem) {
+        existingItem.quantity += quantity_diff; // Add the new selected quantity to the existing item
+        existingItem.price = existingItem.unit_price * existingItem.quantity; // Update total price
     } else {
-        // Non-authenticated User: Update localStorage
-        // ... [your existing logic for non-authenticated users]
+        clientBasket.push(item);
+    }
+
+    localStorage.setItem('clientBasket', JSON.stringify(clientBasket));
+}
+}
+
+
+function waitForElement(selector, callback) {
+    if (document.querySelector(selector)) {
+        callback();
+    } else {
+        setTimeout(function() {
+            waitForElement(selector, callback);
+        }, 100);
     }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     fetchBasket();
+    waitForElement('.component-container', function() {
+        bindEventListeners();
+        calculateOverallValue();
+    });
+    
 });
 
 </script>
