@@ -64,7 +64,7 @@ function addToBasket(item) {
         fetch('{% url 'cart_operations' %}', {
             method: 'POST',
             headers: {
-                'Authorization': `Token1 ${authToken}`,
+                'Authorization': `Token ${authToken}`,
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ menuitem: item.menuitem, quantity: item.quantity })
