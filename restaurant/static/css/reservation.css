@@ -7,7 +7,7 @@
 }
 
 /* Date picker style */
-#datePicker {
+.datePicker {
   flex: 1;
   padding: .5rem 1rem;
   border: 1px solid #495E57;
