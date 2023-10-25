@@ -11,6 +11,7 @@
                 {{ item.title }}
             </a>
         </h3>
+    <div id="message_{{ item.pk }}" class="message-box"></div>
     <span class="menu-item">
         <span class="menu-price">Price: ${{ item.price }}</span>
 
@@ -63,16 +64,27 @@ function addToBasket(item) {
         fetch('{% url 'cart_operations' %}', {
             method: 'POST',
             headers: {
-                'Authorization': `Token ${authToken}`,
+                'Authorization': `Token1 ${authToken}`,
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ menuitem: item.menuitem, quantity: item.quantity })
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(errData => {
+                    throw new Error(errData.message || 'Server error');
+                });
+            }
+            return response.json();
+        })
         .then(data => {
             // Handle authenticated user response
+            showMessage(item.menuitem, "Item has been added to the basket", "success");
         })
-        .catch((error) => console.error('Error:', error));
+        .catch((error) => {
+            showMessage(item.menuitem, "Item has not been added to the basket", "error");
+        });
+
     } 
     else {
     let clientBasket = JSON.parse(localStorage.getItem('clientBasket')) || [];
@@ -86,7 +98,29 @@ function addToBasket(item) {
     }
 
     localStorage.setItem('clientBasket', JSON.stringify(clientBasket));
+    showMessage(item.menuitem, "Item has been added to the basket", "success");
+
 }
+}
+
+
+function showMessage(menuitemId, message, type) {
+    const messageBox = document.getElementById("message_" + menuitemId);
+    
+    // Clear previous 'error' and 'success' classes
+    messageBox.classList.remove("error", "success");
+    
+    // Add the new type class
+    messageBox.classList.add(type);
+    
+    // Display the message
+    messageBox.style.display = "block";
+    messageBox.innerHTML = message;
+
+    // Hide the message after 3 seconds
+    setTimeout(() => {
+        messageBox.style.display = "none";
+    }, 3000);
 }
 </script>
 {% endblock %}
