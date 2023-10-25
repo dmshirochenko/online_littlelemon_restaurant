@@ -158,7 +158,8 @@ class CartOperationsViewTestCase(APITestCase):
         self.client.post(self.cart_url, data)
 
         # Then try to clear the cart
-        response = self.client.delete(self.cart_url)
+        data = {"menuitem": self.menu_item.id}
+        response = self.client.delete(self.cart_url, data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # Check if cart is actually cleared
