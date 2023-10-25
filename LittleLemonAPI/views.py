@@ -182,8 +182,19 @@ class CartOperationsView(generics.ListCreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete(self, request, *args, **kwargs):
-        Cart.objects.all().filter(user=self.request.user).delete()
-        return Response("ok")
+        menuitem_id = request.data.get('menuitem')
+
+        if not menuitem_id:
+            return Response({"error": "menuitem_id not provided."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Filter based on user and menuitem
+        cart_item = Cart.objects.filter(user=self.request.user, menuitem_id=menuitem_id)
+
+        if not cart_item.exists():
+            return Response({"error": "Item not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        cart_item.delete()
+        return Response({"message": "Item has been deleted"}, status=status.HTTP_200_OK)
 
 
 class OrderOperationsView(generics.ListCreateAPIView):

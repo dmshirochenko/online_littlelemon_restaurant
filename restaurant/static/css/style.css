@@ -367,22 +367,34 @@ footer p {
     text-align: center;
 }
 
-/* Action Button */
+/* Action Button with higher specificity */
 .component-container .action-button {
     flex-grow: 1;
     height: 40px;
-    background-color: #C7C7CC; /* Gray */
     border: none;
     border-radius: 25px; /* Half of height to get pill shape */
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.3s;
-    
+    background: linear-gradient(145deg, #3a4e48, #517866); /* Applying the linear gradient */
 }
 
-.component-container .action-button:hover {
-    background-color: #B0B0B5; /* Slightly darker gray on hover */
+/* Delete button with higher specificity */
+.component-container .action-button.delete-button {
+    background-color: #517866;
+    background-image: var(--delete-icon-url);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
 }
+
+/* Hover effect with higher specificity */
+.component-container .action-button.delete-button:hover {
+    background-color: #3a4e48; /* Slightly darker gray on hover */
+}
+
+
+
 
 /* Cart item */
 .floating-cart {
@@ -427,3 +439,24 @@ footer p {
     font-weight: bold;  /* Make the text bold for emphasis */
     margin: 10px 0;     /* Provide some margin above and below for spacing */
 }
+
+/*Message box*/
+.message-box {
+    margin-top: 15px;
+    padding: 10px;
+    border: 1px solid;
+    display: none; 
+}
+
+.message-box.error {
+    border-color: #dc3545;
+    color: #dc3545;
+    background-color: #f8d7da;
+}
+
+.message-box.success {
+    border-color: #28a745;
+    color: #28a745;
+    background-color: #d4edda;
+}
+

@@ -2,6 +2,12 @@
 {% load static %}
 
 {% block content %}
+<style>
+    :root {
+        --delete-icon-url: url('{% static "img/delete_item_icon.png" %}');
+    }
+</style>
+
 <h1>Your Basket</h1>
 <div class="column">
 
@@ -9,6 +15,7 @@
     <hr id="overallValueLine">
     <span id="overallValue"></span>
 </div>
+
 
 <script>
 
@@ -20,17 +27,20 @@ function formatBasketData(item) {
                 ${item.menuitem_details.title}
             </a>
         </h3>
+        <div id="message_${item.menuitem}" class="message-box"></div>
         <span class="basket-info">
             <!-- Quantity Selector -->
             <div class="component-container">
                 <button class="minus-button" data-action="decrement" data-menuitem="${item.menuitem}" data-unit-price="${item.unit_price}">−</button>
                 <span class="quantity-display" id="quantity_${item.menuitem}">${item.quantity}</span>
                 <button class="plus-button" data-action="increment" data-menuitem="${item.menuitem}" data-unit-price="${item.unit_price}">+</button>
+                <button class="action-button delete-button" style="background-image: url('{% static "img/delete_item_icon.png" %}');" data-menuitem="${item.menuitem}"></button>
             </div>
             <span class="basket-price-total" id="totalPrice_${item.menuitem}">Total Price per unit: $${item.price}</span>
         </span>
     `;
 }
+
 
 // After rendering all items, bind the event listeners
 function bindEventListeners() {
@@ -52,6 +62,15 @@ function bindEventListeners() {
                 unit_price: this.dataset.unitPrice,
             };
             updateQuantity('increment', item);
+        });
+    });
+
+    // Add event listener for delete-button
+    document.querySelectorAll('.delete-button').forEach(button => {
+        button.addEventListener('click', function() {
+        console.log("Delete button clicked:", this.dataset.menuitem);
+        const menuitemId = this.dataset.menuitem;
+        deleteMenuItem(menuitemId);
         });
     });
 }
@@ -87,7 +106,9 @@ function renderBasketItems(basketItems) {
     const basketContainer = document.getElementById('basket-container');
     basketItems.forEach(item => {
         const basketItem = document.createElement('div');
+
         basketItem.className = "basket-item";
+        basketItem.id = `basket_item_${item.menuitem}`;
         basketItem.innerHTML = formatBasketData(item);
         
         // Update href for the menu item link
@@ -138,38 +159,49 @@ function fetchBasket() {
     }
 }
 
-function updateQuantity(action, item) {
+async function updateQuantity(action, item) {
     const quantityDisplay = document.getElementById('quantity_' + item.menuitem);
     let quantity = parseInt(quantityDisplay.textContent);
 
     // Assuming you have the unit_price available in the item object
     let unitPrice = parseFloat(item.unit_price); 
 
-    if (action === 'decrement' && quantity > 1) {
-        quantity--;
-        updateBasket(action, item);
-    } else if (action === 'increment') {
-        quantity++;
-        updateBasket(action, item);
+    try {
+        if (action === 'decrement' && quantity > 1) {
+            quantity--;
+            let response = await updateBasket(action, item);
+            if (!response) {
+                return;
+            }
+        } else if (action === 'increment') {
+            quantity++;
+            let response = await updateBasket(action, item);
+            if (!response) {
+                return;
+            }
+        }
+
+        // Calculate the updated total price for the item
+        let updatedTotalPrice = quantity * unitPrice;
+
+        // Update the DOM elements
+        quantityDisplay.textContent = quantity;
+        const totalPriceDisplay = document.getElementById('totalPrice_' + item.menuitem);
+        totalPriceDisplay.textContent = 'Total Price per unit: $' + updatedTotalPrice.toFixed(2);
+
+        // Update the item object
+        item.quantity = quantity;
+        item.price = updatedTotalPrice;
+
+        // Recalculate the overall value
+        calculateOverallValue();
+    } catch (error) {
+        console.error("Error in updateQuantity:", error);
     }
-
-    // Calculate the updated total price for the item
-    let updatedTotalPrice = quantity * unitPrice;
-
-    // Update the DOM elements
-    quantityDisplay.textContent = quantity;
-    const totalPriceDisplay = document.getElementById('totalPrice_' + item.menuitem);
-    totalPriceDisplay.textContent = 'Total Price per unit: $' + updatedTotalPrice.toFixed(2);
-
-    // Update the item object
-    item.quantity = quantity;
-    item.price = updatedTotalPrice;
-
-    // Recalculate the overall value
-    calculateOverallValue();
 }
 
-function updateBasket(action, item) {
+
+async function updateBasket(action, item) {
     const authToken = sessionStorage.getItem('token');
     item.menuitem = parseInt(item.menuitem, 10);
     let quantity_diff = 0;
@@ -180,37 +212,45 @@ function updateBasket(action, item) {
         quantity_diff = 1;
     }
 
-    console.log("quantity_diff", quantity_diff)
     if (authToken) {
         // Authenticated User: Add to server-side basket
-        
-        fetch('{% url 'cart_operations' %}', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Token ${authToken}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ menuitem: item.menuitem, quantity: quantity_diff })
-        })
-        .then(response => response.json())
-        .then(data => {
+        try {
+            const response = await fetch('{% url 'cart_operations' %}', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Token ${authToken}`,
+                    'Content-Type': 'application/json',
+                    // 'X-CSRFToken': csrfToken   // if you need CSRF token
+                },
+                body: JSON.stringify({ menuitem: item.menuitem, quantity: quantity_diff })
+            });
+
+            if (!response.ok) {
+                const errData = await response.json();
+                throw new Error(errData.message);
+            }
+
+            const data = await response.json();
             // Handle authenticated user response
-        })
-        .catch((error) => console.error('Error:', error));
-    } 
-    else {
-    let clientBasket = JSON.parse(localStorage.getItem('clientBasket')) || [];
-    const existingItem = clientBasket.find(existing => existing.menuitem === item.menuitem);
-
-    if (existingItem) {
-        existingItem.quantity += quantity_diff; // Add the new selected quantity to the existing item
-        existingItem.price = existingItem.unit_price * existingItem.quantity; // Update total price
+            return true; // Return true if everything went well
+        } catch (error) {
+            showMessage(item.menuitem, "Item has not been updated", "error");
+            return false; // Return false if any error occurred
+        }
     } else {
-        clientBasket.push(item);
-    }
+        let clientBasket = JSON.parse(localStorage.getItem('clientBasket')) || [];
+        const existingItem = clientBasket.find(existing => existing.menuitem === item.menuitem);
 
-    localStorage.setItem('clientBasket', JSON.stringify(clientBasket));
-}
+        if (existingItem) {
+            existingItem.quantity += quantity_diff; // Add the new selected quantity to the existing item
+            existingItem.price = existingItem.unit_price * existingItem.quantity; // Update total price
+        } else {
+            clientBasket.push(item);
+        }
+
+        localStorage.setItem('clientBasket', JSON.stringify(clientBasket));
+        return true; // Assuming success for the client-side basket update
+    }
 }
 
 
@@ -223,6 +263,69 @@ function waitForElement(selector, callback) {
         }, 100);
     }
 }
+
+function deleteMenuItem(menuitemId) {
+    const authToken = sessionStorage.getItem('token');
+    if (authToken) {
+        // For authenticated users: Make a DELETE request
+        fetch('{% url 'cart_operations' %}', {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Token ${authToken}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ menuitem: menuitemId })
+        })
+        .then(response => {
+            if (response.status === 200) {
+                const basketItem = document.getElementById(`basket_item_${menuitemId}`);
+                    if (basketItem) {
+                        basketItem.remove();
+                    }
+                    calculateOverallValue();
+            } else {
+                // Handle error
+                console.error("Error deleting the item.");
+                showMessage(menuitemId, "Error deleting the item.", "error");
+                
+            }
+        });
+    } else {
+        // For non-auth users: Remove from localStorage
+        let cart = JSON.parse(localStorage.getItem('clientBasket') || '[]');
+        cart = cart.filter(item => item.menuitem !== parseInt(menuitemId));
+        localStorage.setItem('clientBasket', JSON.stringify(cart));
+
+        const basketItem = document.getElementById(`basket_item_${menuitemId}`);
+                    if (basketItem) {
+                        basketItem.remove();
+                    }
+                    
+        calculateOverallValue();
+    }
+}
+
+function showMessage(menuitemId, message, type) {
+    const messageBox = document.getElementById("message_" + menuitemId);
+    
+    // Clear previous 'error' and 'success' classes
+    messageBox.classList.remove("error", "success");
+    
+    // Add the new type class
+    messageBox.classList.add(type);
+    
+    // Display the message
+    messageBox.style.display = "block";
+    messageBox.innerHTML = message;
+
+    // Hide the message after 3 seconds
+    setTimeout(() => {
+        messageBox.style.display = "none";
+    }, 3000);
+}
+
+
+
 
 document.addEventListener('DOMContentLoaded', () => {
     fetchBasket();
