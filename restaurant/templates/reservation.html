@@ -2,6 +2,8 @@
 {% load static %}
 
 {% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/reservation.css' %}">
+
 <section>
   <article>
     <h1>All reservations</h1>
@@ -9,7 +11,7 @@
     <div class="row">
       <div class="column" id="formColumn">
         <div class="form-control">
-          <input type="date" id="datePicker">
+          <input type="date" class="datePicker" id="datePicker">
           <button id="fetchButton">Fetch Bookings</button>
         </div>
         <div id="loader">Loading...</div>
@@ -24,6 +26,6 @@
   </article>
 </section>
 
-<link rel="stylesheet" type="text/css" href="{% static 'css/reservation.css' %}">
+
 <script src="{% static 'js/reservation.js' %}"></script>
 {% endblock %}

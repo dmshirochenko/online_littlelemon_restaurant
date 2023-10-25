@@ -1,0 +1,40 @@
+/* Date picker style */
+.datePicker {
+    flex: 1;
+    padding: .5rem 1rem;
+    border: 1px solid #495E57;
+    border-radius: 5px;
+    background-color: #f4f4f4;
+    font-size: 1.25rem;
+    color: #333;
+  }
+
+
+/* Reservation Slot */
+#reservation_slot {
+    font-size: 16px;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    appearance: none; /* removes default arrow in some browsers */
+    background-color: #f9f9f9;
+    color: #333;
+    cursor: pointer;
+}
+
+
+#first_name {
+    font-size: 16px;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    color: #333;
+    box-sizing: border-box; 
+    transition: border-color 0.3s ease; 
+}
+
+#first_name:focus {
+    border-color: #007BFF;
+    outline: none; /* Removes the default browser outline */
+}

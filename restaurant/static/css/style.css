@@ -460,3 +460,20 @@ footer p {
     background-color: #d4edda;
 }
 
+/* By default, only show the button for larger screens */
+.action-button.large-screen {
+    display: block;
+}
+.action-button.small-screen {
+    display: none;
+}
+
+/* For smaller screens, hide the large button and show the small one */
+@media (max-width: 768px) {
+    .action-button.large-screen {
+        display: none;
+    }
+    .action-button.small-screen {
+        display: block;
+    }
+}

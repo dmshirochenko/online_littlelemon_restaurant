@@ -20,7 +20,8 @@
             <button class="minus-button" onclick="updateQuantity('decrement', item_{{ item.pk }})">−</button>
             <span class="quantity-display" id="quantity_{{ item.pk }}">1</span>
             <button class="plus-button" onclick="updateQuantity('increment', item_{{ item.pk }})">+</button>
-            <button class="action-button" onclick="addToBasket(item_{{ item.pk }})">Add 1 for ${{ item.price }}</button>
+            <button class="action-button large-screen" onclick="addToBasket(item_{{ item.pk }})">Add 1 for ${{ item.price }}</button>
+            <button class="action-button small-screen" onclick="addToBasket(item_{{ item.pk }})">Add</button>
         </div>
     </span>
 
@@ -51,8 +52,11 @@ function updateQuantity(action, item) {
         }
         quantityDisplay.textContent = quantity;
         item.quantity = quantity;
-        const actionButton = quantityDisplay.closest('.component-container').querySelector('.action-button');
-        actionButton.textContent = `Add ${quantity} for $${(item.unit_price * quantity).toFixed(2)}`;
+
+        const componentContainer = quantityDisplay.closest('.component-container');
+        const largeScreenButton = componentContainer.querySelector('.action-button.large-screen');
+        const buttonText = `Add ${quantity} for $${(item.unit_price * quantity).toFixed(2)}`;
+        largeScreenButton.textContent = buttonText;
     }
 
 
