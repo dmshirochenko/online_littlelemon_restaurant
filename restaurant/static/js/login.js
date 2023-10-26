@@ -56,7 +56,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (result.auth_token) {
                 sessionStorage.setItem('token', result.auth_token);
+                
+                const clientBasket = localStorage.getItem('clientBasket') || null;
+                console.log("Basket = ",  clientBasket)
+                if(clientBasket){
+                try {
+                    const basketData = await saveBasket(result.auth_token, clientBasket);
+                    console.log('Basket saved successfully', basketData);
+                } catch (error) {
+                    console.error('Failed to save basket:', error);
+                }
+                };
                 showMessage("Successfully logged in", "success");
+                
 
                 setTimeout(() => {
                     window.location.href = homeUrl;
@@ -68,6 +80,36 @@ document.addEventListener("DOMContentLoaded", () => {
             showMessage(error.message, "error");
         }
     });
+
+    async function saveBasket(authToken, clientBasket) {
+        const csrfToken = getCSRFToken();  // Added const here
+    
+        try {
+            const response = await fetch('/api/sync-cart', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Token ${authToken}`,
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                },
+                body: JSON.stringify({
+                    clientBasket: JSON.parse(localStorage.getItem('clientBasket') || '[]'),
+                }),
+            });
+    
+            if (!response.ok) {
+                throw new Error('Basket saving failed');
+            }
+    
+            localStorage.removeItem('clientBasket');
+            return await response.json();
+    
+        } catch (error) {
+            console.error('An error occurred:', error);
+            throw error;
+        }
+    }
+    
 
     function showMessage(message, type) {
         const messageBox = document.getElementById("message");

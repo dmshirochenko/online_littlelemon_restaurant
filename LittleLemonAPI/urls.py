@@ -7,6 +7,7 @@ urlpatterns = [
     path("menu-items/<int:pk>", views.MenuItemDetailView.as_view(), name="menu_item_detail"),
     path("item-of-the-day/update/<int:pk>", views.UpdateItemOfTheDayView.as_view(), name="update_item_of_day"),
     path("cart/menu-items", views.CartOperationsView.as_view(), name="cart_operations"),
+    path("sync-cart", views.SyncBasket.as_view(), name="sync_cart"),
     path("orders", views.OrderOperationsView.as_view(), name="order_operations"),
     path("orders/<int:pk>", views.SingleOrderView.as_view(), name="single_order_view"),
     path("orders/assign", views.AssignOrderToDeliveryCrewView.as_view(), name="assign_order"),
