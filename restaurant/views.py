@@ -6,6 +6,7 @@ from django.core import serializers
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
+
 from .forms import BookingForm
 from .models import Booking
 from LittleLemonAPI.models import MenuItem
@@ -21,6 +22,10 @@ def about(request):
 
 def basket(request):
     return render(request, "basket.html")
+
+
+def confirmation(request):
+    return render(request, "confirmation.html")
 
 
 def register(request):

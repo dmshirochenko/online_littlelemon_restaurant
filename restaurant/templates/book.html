@@ -55,9 +55,7 @@
   const formattedDay = date.getDate().toString().padStart(2, '0');
   document.getElementById('reservation_date').value = `${date.getFullYear()}-${formattedMonth}-${formattedDay}`;
 
-  console.log(document.getElementById('reservation_date').value)
   getBookings()
-
 
   document.getElementById('reservation_date').addEventListener('change', function () {
     getBookings()
@@ -75,7 +73,6 @@
         reserved_slots = []
         bookings = ''
         for (item of data) {
-          console.log(item.fields)
           reserved_slots.push(item.fields.reservation_slot)
           bookings += `<p>${item.fields.first_name} - ${formatTime(item.fields.reservation_slot)}</p>`
         }
