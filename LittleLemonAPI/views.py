@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import viewsets
 
-
+from django.db import transaction
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 
@@ -131,39 +131,25 @@ class MarkOrderDeliveredView(generics.UpdateAPIView):
             )
 
 
-class CartOperationsView(generics.ListCreateAPIView):
-    serializer_class = CartSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return Cart.objects.filter(user=self.request.user).select_related("menuitem")
-
-    def post(self, request, *args, **kwargs):
-        menu_item_id = request.data.get("menuitem")
+class BaseCartOperationsView:
+    def add_or_update_cart_item(self, request, menu_item_id, quantity):
         menu_item = get_object_or_404(MenuItem, id=menu_item_id)
-
         unit_price = float(menu_item.price)
-        quantity = int(request.data.get("quantity"))
 
-        # Find existing basket item
         existing_item = Cart.objects.filter(user=request.user.id, menuitem=menu_item.id).first()
 
         if existing_item:
-            # Update existing item
             existing_item.quantity = F("quantity") + quantity  # Using F() for atomic update
             existing_item.save(update_fields=["quantity"])
             existing_item.refresh_from_db()
 
-            # Now update price based on updated quantity
             existing_item.price = existing_item.unit_price * existing_item.quantity
             existing_item.save(update_fields=["price"])
 
-            # Reload to get updated values
             existing_item.refresh_from_db()
 
             serializer = self.serializer_class(existing_item)
         else:
-            # Create new basket item
             total_price = unit_price * quantity
             data = {
                 "user": request.user.id,
@@ -172,17 +158,35 @@ class CartOperationsView(generics.ListCreateAPIView):
                 "unit_price": unit_price,
                 "price": total_price,
             }
-
             serializer = self.serializer_class(data=data)
             if serializer.is_valid():
                 serializer.save()
             else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return None, serializer.errors
+
+        return serializer, None
+
+
+class CartOperationsView(generics.ListCreateAPIView, BaseCartOperationsView):
+    serializer_class = CartSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Cart.objects.filter(user=self.request.user).select_related("menuitem")
+
+    def post(self, request, *args, **kwargs):
+        menu_item_id = request.data.get("menuitem")
+        quantity = int(request.data.get("quantity"))
+
+        serializer, errors = self.add_or_update_cart_item(request, menu_item_id, quantity)
+
+        if errors:
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete(self, request, *args, **kwargs):
-        menuitem_id = request.data.get('menuitem')
+        menuitem_id = request.data.get("menuitem")
 
         if not menuitem_id:
             return Response({"error": "menuitem_id not provided."}, status=status.HTTP_400_BAD_REQUEST)
@@ -195,6 +199,33 @@ class CartOperationsView(generics.ListCreateAPIView):
 
         cart_item.delete()
         return Response({"message": "Item has been deleted"}, status=status.HTTP_200_OK)
+
+
+class SyncBasket(generics.ListCreateAPIView, BaseCartOperationsView):
+    serializer_class = CartSerializer
+    permission_classes = [IsAuthenticated]
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        client_basket = request.data.get("clientBasket", [])
+        responses = []
+        errors = []
+
+        for item in client_basket:
+            menu_item_id = item.get("menuitem")
+            quantity = int(item.get("quantity"))
+
+            serializer, err = self.add_or_update_cart_item(request, menu_item_id, quantity)
+
+            if err:
+                errors.append(err)
+            else:
+                responses.append(serializer.data)
+
+        if errors:
+            return Response({"errors": errors}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"message": responses}, status=status.HTTP_201_CREATED)
 
 
 class OrderOperationsView(generics.ListCreateAPIView):
