@@ -477,3 +477,18 @@ footer p {
         display: block;
     }
 }
+
+/*For Button and message on basket/cart page*/
+.center-align {
+        text-align: center;
+        display: block;
+        margin: auto;
+}
+
+.register-message {
+    font-size: 32px;  /* Adjust as needed */
+}
+
+.empty-cart-message{
+    font-size: 32px;  /* Adjust as needed */
+}
