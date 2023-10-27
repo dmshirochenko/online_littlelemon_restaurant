@@ -9,6 +9,7 @@ urlpatterns = [
     path("reservations/", views.reservation, name="reservations"),
     path("basket/", views.basket, name="basket"),
     path("confirmation/", views.confirmation, name="order_confirmation_page"),
+    path("privacy-policy/", views.privacy_policy_page, name="private_policy_page"),
     # Add the remaining URL path configurations here
     path("menu/", views.menu, name="menu"),
     path("menu_item/<int:pk>/", views.display_menu_items, name="menu_item"),
