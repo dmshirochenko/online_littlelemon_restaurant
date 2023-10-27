@@ -1,0 +1,14 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'css/consent_message.css' %}">
+
+<div id="cookie-consent-banner" class="cookie-banner">
+    <div class="cookie-message">
+      This website uses cookies to enhance your experience and analyze site traffic. 
+      <a href="/privacy-policy" target="_blank">Learn more</a>.
+    </div>
+    <button id="decline-button" class="consent-button">Decline</button>
+    <button id="consent-button" class="consent-button">Accept</button>
+</div>
+
+<script src="{% static 'js/is_consent_given.js' %}"></script>

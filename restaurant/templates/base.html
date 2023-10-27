@@ -10,7 +10,7 @@
     <meta name="description" content="A brief description" />
     <meta
       name="author"
-      content="Based in Chicago, Illinois, Little Lemon is a family owned Mediterranean restaurant, focused on traditional recipes served with a modern twist."
+      content="Based in Pavlodar, Kazakhstan, Little Lemon is a family owned Mediterranean restaurant, focused on traditional recipes served with a modern twist."
     />
 
     <!-- Load favicon -->
@@ -27,7 +27,9 @@
       href="{% static 'css/style.css' %}"
       onload="this.rel = 'stylesheet'"
     />
-
+    
+    <!--GTM implementation-->
+    <script src="{% static 'js/gtm_head.js' %}"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -37,11 +39,16 @@
   </head>
 
   <body>
+    <!--GTM implementation-->
+    <script src="{% static 'js/gtm_head.js' %}"></script>
+
     <!--Header content-->
     {% include 'partials/_header.html' %}
-
+    
     <main>{% block content %} {% endblock %}</main>
-
+    
+    <!--Consent message-->
+    {% include 'partials/_consent_message.html' %}
     <!--Footer content-->
     {% include 'partials/_footer.html' %}
   </body>
